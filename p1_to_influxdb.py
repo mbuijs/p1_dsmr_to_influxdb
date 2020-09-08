@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 
 from dsmr_parser import telegram_specifications, obis_references
-from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V4
+from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V5
 from influxdb import InfluxDBClient
 import pprint
 import os
 import decimal
 import time
-
 
 prev_gas=None
 while True:
@@ -18,17 +17,12 @@ while True:
         #serial port settings and version
         serial_reader = SerialReader(
             device=os.environ['SERIAL_PORT'],
-            serial_settings=SERIAL_SETTINGS_V4,
-            telegram_specification=telegram_specifications.V4
-        )
-
-        print("Connecting db")
-        db.create_database('energy')
-        
+            serial_settings=SERIAL_SETTINGS_V5,
+            telegram_specification=telegram_specifications.V5
+        )        
 
         #read telegrams
         print("Waiting for P1 port measurement..")
-
 
         for telegram in serial_reader.read():
             influx_measurement={
@@ -74,6 +68,3 @@ while True:
         print(str(e))
         print("Pausing and restarting...")
         time.sleep(10)
-
-
-
