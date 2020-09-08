@@ -1,0 +1,2 @@
+dsmr-parser==0.22
+influxdb==5.3.0

@@ -4,7 +4,7 @@ from dsmr_parser import telegram_specifications, obis_references
 from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V4
 from influxdb import InfluxDBClient
 import pprint
-import config
+import os
 import decimal
 import time
 
@@ -13,11 +13,11 @@ prev_gas=None
 while True:
     try:
         #influx db settings
-        db = InfluxDBClient(config.host,config.port, config.username, config.password, config.database)
+        db = InfluxDBClient(os.environ['INFLUXDB_HOST'], os.environ['INFLUXDB_PORT'], os.environ['INFLUXDB_USER'], os.environ['INFLUXDB_PASS'], os.environ['INFLUXDB_DB'])
 
         #serial port settings and version
         serial_reader = SerialReader(
-            device=config.serial_port,
+            device=os.environ['SERIAL_PORT'],
             serial_settings=SERIAL_SETTINGS_V4,
             telegram_specification=telegram_specifications.V4
         )
