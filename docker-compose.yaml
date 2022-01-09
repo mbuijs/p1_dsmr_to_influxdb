@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  p1-exporter:
+    build:
+      context: ./p1-exporter
+      dockerfile: p1-exporter.dockerfile
+    restart: unless-stopped
+    container_name: p1-exporter
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+
+networks:
+  default:
+    external:
+      name: localmachine

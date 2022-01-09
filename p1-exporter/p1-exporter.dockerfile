@@ -1,7 +1,7 @@
 FROM python:3
 
 ENV SERIAL_PORT=/dev/ttyUSB0 \
-	INFLUXDB_HOST=localhost \
+	INFLUXDB_HOST=meter-pi \
     INFLUXDB_PORT=8086 \
     INFLUXDB_USER=root \
     INFLUXDB_PASS=root \
@@ -9,9 +9,9 @@ ENV SERIAL_PORT=/dev/ttyUSB0 \
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
+COPY ./resources/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./resources/p1_to_influxdb.py ./
 
 CMD [ "python", "./p1_to_influxdb.py" ]
