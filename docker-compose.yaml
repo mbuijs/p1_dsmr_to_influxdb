@@ -5,6 +5,8 @@ services:
     build:
       context: ./p1-exporter
       dockerfile: p1-exporter.dockerfile
+    logging:
+      driver: none
     restart: unless-stopped
     container_name: p1-exporter
     devices:
