@@ -1,7 +1,7 @@
 FROM python:3
 
 ENV SERIAL_PORT=/dev/ttyUSB0 \
-	INFLUXDB_HOST=meter-pi \
+	INFLUXDB_HOST=rig01.fritz.box \
     INFLUXDB_PORT=8086 \
     INFLUXDB_USER=root \
     INFLUXDB_PASS=root \
