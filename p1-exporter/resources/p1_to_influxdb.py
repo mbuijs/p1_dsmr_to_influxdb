@@ -36,7 +36,6 @@ while True:
 
         for telegram in serial_reader.read():
             influx_measurement = {"measurement": "P1", "fields": {}}
-            report = []
 
             # create influx measurement record
             for key, value in telegram.items():
@@ -50,21 +49,21 @@ while True:
                             break
 
                     # Filter out failure log entries
-                    if name != "POWER_EVENT_FAILURE_LOG":
-                        # is it a number?
-                        if isinstance(value.value, int) or isinstance(
-                            value.value, decimal.Decimal
-                        ):
-                            nr = float(value.value)
-                            # filter duplicates gas , since its hourly. (we want to be able to differentiate it, duplicate values confuse that)
-                            if name == "HOURLY_GAS_METER_READING":
-                                if prev_gas != None and nr != prev_gas:
-                                    influx_measurement["fields"][name] = float(
-                                        value.value
-                                    )
-                                prev_gas = nr
-                            else:
+                    if name == "POWER_EVENT_FAILURE_LOG":
+                        continue
+
+                    # is it a number?
+                    if isinstance(value.value, int) or isinstance(
+                        value.value, decimal.Decimal
+                    ):
+                        nr = float(value.value)
+                        # filter duplicates gas , since its hourly. (we want to be able to differentiate it, duplicate values confuse that)
+                        if name == "HOURLY_GAS_METER_READING":
+                            if prev_gas != None and nr != prev_gas:
                                 influx_measurement["fields"][name] = float(value.value)
+                            prev_gas = nr
+                        else:
+                            influx_measurement["fields"][name] = float(value.value)
 
             pprint.pprint(influx_measurement)
             if len(influx_measurement["fields"]):
