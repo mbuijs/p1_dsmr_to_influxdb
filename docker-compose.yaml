@@ -8,9 +8,15 @@ services:
     restart: unless-stopped
     container_name: p1-exporter
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/serial/by-id/usb-FTDI_P1_Converter_Cable_A6Y59ZYV-if00-port0:/dev/ttyUSB0
+    environment:
+      - "SERIAL_PORT=/dev/ttyUSB0"
+      - "INFLUXDB_V2_URL=http://influxdb:8086"
+      - "INFLUXDB_V2_TOKEN=sfmX7lqShU0qPDiWXnr1bxeO7T8FKgVho5rQg5l2SqPzTm2ZQu4mmfUt6TqNG7CtwKNJiR-R_0GsTW7qYZShgg=="
+      - "INFLUXDB_V2_ORG=thuis"
+      - "INFLUXDB_V2_BUCKET=energie"
 
 networks:
   default:
     external:
-      name: localmachine
+      name: influx_net
