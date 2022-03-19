@@ -1,24 +1,34 @@
 #!/usr/bin/python3
 
 from dsmr_parser import telegram_specifications, obis_references
-from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V5
-from influxdb import InfluxDBClient
+from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V4
+
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import SYNCHRONOUS
+
 import pprint
 import os
 import decimal
+import sys
 import time
+import traceback
+
 
 prev_gas=None
 while True:
     try:
         #influx db settings
-        db = InfluxDBClient(os.environ['INFLUXDB_HOST'], os.environ['INFLUXDB_PORT'], os.environ['INFLUXDB_USER'], os.environ['INFLUXDB_PASS'], os.environ['INFLUXDB_DB'])
+        print("Opening Influx connection...")
+        db = InfluxDBClient.from_env_properties()
+        write_api = db.write_api(write_options=SYNCHRONOUS)
 
         #serial port settings and version
+        device = os.environ['SERIAL_PORT']
+        print(f"Opening serial port '{device}'")
         serial_reader = SerialReader(
-            device=os.environ['SERIAL_PORT'],
-            serial_settings=SERIAL_SETTINGS_V5,
-            telegram_specification=telegram_specifications.V5
+            device=device,
+            serial_settings=SERIAL_SETTINGS_V4,
+            telegram_specification=telegram_specifications.V4
         )        
 
         #read telegrams
@@ -26,11 +36,7 @@ while True:
 
         for telegram in serial_reader.read():
             influx_measurement={
-                "measurement": "P1 values",
-                # "tags": {
-                #     "host": "server01",
-                #     "region": "us-west"
-                # },
+                "measurement": "P1",
                 "fields": {
                 }
             }
@@ -63,8 +69,9 @@ while True:
 
             pprint.pprint(influx_measurement)
             if len(influx_measurement['fields']):
-                db.write_points([influx_measurement])
+                write_api.write(bucket=os.environ['INFLUXDB_V2_BUCKET'],record=[influx_measurement])
     except Exception as e:
-        print(str(e))
+        traceback.print_exception(e,file=sys.stdout)
+        #print(str(e))
         print("Pausing and restarting...")
-        time.sleep(10)
+        time.sleep(5)
